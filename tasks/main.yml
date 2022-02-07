@@ -1,0 +1,65 @@
+---
+- include_vars: '{{ item }}'
+  with_first_found:
+    - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+    - '{{ ansible_distribution }}.yml'
+    - '{{ ansible_os_family }}.yml'
+
+- name: install distribution packages
+  package:
+    name: '{{ item }}'
+    state: 'present'
+  with_items:
+    - '{{ xapp_dev_os_packages }}'
+
+- name: download ric packages (release)
+  get_url:
+    # When supporting new architectures, change amd64 to a new architecture.
+    url: 'https://packagecloud.io/o-ran-sc/release/packages/debian/stretch/{{ item }}/download.deb'
+    dest: '/root/{{ item }}'
+  with_items:
+    - '{{ xapp_dev_ric_packages }}'
+  register: download_release
+
+- name: install package
+  command: 'dpkg -i /root/{{ item }}'
+  with_items:
+    - '{{ xapp_dev_ric_packages }}'
+  when: download_release is defined and download_release.changed
+
+- name: download ric packages (staging)
+  get_url:
+    # When supporting new architectures, change amd64 to a new architecture.
+    url: 'https://packagecloud.io/o-ran-sc/staging/packages/debian/stretch/{{ item }}/download.deb'
+    dest: '/root/{{ item }}'
+  with_items:
+    - '{{ xapp_dev_ric_packages_staging }}'
+  register: download_staging
+
+- name: install package
+  command: 'dpkg -i /root/{{ item }}'
+  with_items:
+    - '{{ xapp_dev_ric_packages_staging }}'
+  when: download_staging is defined and download_staging.changed
+
+- name: create the repository base
+  file:
+    path: '/repos'
+    state: 'directory'
+
+- name: clone repositories
+  git:
+    dest: '/repos/{{ item.dest }}'
+    repo: '{{ item.repo }}'
+  with_items:
+    - '{{ xapp_dev_git_repos }}'
+
+- name: build repositories
+  shell: 'cd /repos/{{ item.dest }} && {{ item.build_cmd }}'
+  with_items:
+    - '{{ xapp_dev_git_repos }}'
+
+- name: setup the environment variables
+  template:
+    src: 'profile.sh.j2'
+    dest: '/etc/profile.d/xapp_dev.sh'

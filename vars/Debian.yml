@@ -1,0 +1,41 @@
+---
+xapp_dev_os_packages:
+  - cmake
+  - git
+  - build-essential
+  - automake
+  - autoconf-archive
+  - autoconf
+  - pkg-config
+  - gawk
+  - libtool
+  - wget
+  - zlib1g-dev
+  - libffi-dev
+  - cpputest
+  - libboost-all-dev
+  - libhiredis-dev
+  - valgrind
+
+
+xapp_dev_ric_packages:
+  - 'mdclog_{{ mdc_ver }}_amd64.deb'
+  - 'mdclog-dev_{{ mdc_ver }}_amd64.deb'
+  - 'rmr_{{ rmr_ver }}_amd64.deb'
+  - 'rmr-dev_{{ rmr_ver }}_amd64.deb'
+  - 'rnib_{{ rnib_ver }}_all.deb'
+
+xapp_dev_ric_packages_staging:
+  - 'riclibe2ap_{{ asn1c_ver }}_amd64.deb'
+  - 'riclibe2ap-dev_{{ asn1c_ver }}_amd64.deb'
+
+xapp_dev_git_repos:
+  - repo: 'https://gerrit.o-ran-sc.org/r/ric-plt/dbaas'
+    dest: 'dbaas'
+    build_cmd: 'cd redismodule && ./autogen.sh && ./configure && make all && make install'
+  - repo: 'https://gerrit.o-ran-sc.org/r/ric-plt/sdl'
+    dest: 'sdl'
+    build_cmd: './autogen.sh && ./configure && make all && make install'
+  - repo: 'https://github.com/Tencent/rapidjson'
+    dest: 'rapidjson'
+    build_cmd: 'mkdir -p build && cd build && cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make install'

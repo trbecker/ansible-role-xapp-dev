@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  author: trbecker
+  description: Role to install O-RAN RIC development environment
+  company: Unisinos
+  license: mit
+  min_ansible_version: 2.9.27
+  platforms:
+    - name: Ubuntu
+      version: all
+  galaxy_tags:
+    - system
+    - o-ran
